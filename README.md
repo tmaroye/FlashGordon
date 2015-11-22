@@ -8,6 +8,9 @@ Bonjour,
 
 Mon projet est de réaliser un robot sumo de comptétition dans la catégorie Mini Sumo.
 
+![Robot] (https://github.com/tmaroye/FlashGordon/blob/master/Photos/fg.jpg)
+
+
 ## Matériel utilisé
 Voici la liste des éléments qui constituent à ce jour mon robot.
 
