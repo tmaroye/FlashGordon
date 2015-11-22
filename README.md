@@ -12,11 +12,11 @@ Mon projet est de réaliser un robot sumo de comptétition dans la catégorie Mi
 
 ## Objetcif :
 Je souhaite participer aux compétitions suivantes :
--The 23rd Singapore Robotic Games 2016 : <http://guppy.mpe.nus.edu.sg/srg/>
-- Next RobotChallenge. March 12/13, 2016 in Vienna's Aula der Wissenschaften : <http://www.robotchallenge.org/sk/contact/>
+-The 23rd Singapore Robotic Games 2016 : <http://guppy.mpe.nus.edu.sg/srg/><br/>
+- Next RobotChallenge. March 12/13, 2016 in Vienna's Aula der Wissenschaften : <http://www.robotchallenge.org/sk/contact/><br/>
 -Competicition de ESIEE. Elle se déroulera le 19 mars 2016 dans les locaux de l’école ESIEE PARIS à Noisy-le-Grand (Est de Paris – à 2 min du RER A, station Noisy-Champs).
-Réglement et information : <http://www.esieespace.fr/category/sumobot-challenge/>
--Prochain Tournoi 21 et 22 mai 2016, Nîmes : <http://www.robot-sumo.fr/>
+Réglement et information : <http://www.esieespace.fr/category/sumobot-challenge/><br/>
+-Prochain Tournoi 21 et 22 mai 2016, Nîmes : <http://www.robot-sumo.fr/><br/>
 
 ## Matériel utilisé
 Voici la liste des éléments qui constituent à ce jour mon robot.
