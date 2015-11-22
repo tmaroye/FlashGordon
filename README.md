@@ -10,6 +10,13 @@ Mon projet est de réaliser un robot sumo de comptétition dans la catégorie Mi
 
 ![Robot] (https://github.com/tmaroye/FlashGordon/blob/master/Photos/FG.jpg)
 
+## Objetcif :
+Je souhaite participer aux compétitions suivantes :
+-The 23rd Singapore Robotic Games 2016 : <http://guppy.mpe.nus.edu.sg/srg/>
+- Next RobotChallenge. March 12/13, 2016 in Vienna's Aula der Wissenschaften : <http://www.robotchallenge.org/sk/contact/>
+-Competicition de ESIEE. Elle se déroulera le 19 mars 2016 dans les locaux de l’école ESIEE PARIS à Noisy-le-Grand (Est de Paris – à 2 min du RER A, station Noisy-Champs).
+Réglement et information : <http://www.esieespace.fr/category/sumobot-challenge/>
+-Prochain Tournoi 21 et 22 mai 2016, Nîmes : <http://www.robot-sumo.fr/>
 
 ## Matériel utilisé
 Voici la liste des éléments qui constituent à ce jour mon robot.
@@ -43,7 +50,6 @@ Pour la corretion de direction et la détection de choc, j'utilise un GY-88.
 
 <https://hackspark.fr/fr/10dof-imu-gy-88-barometer-gyroscope-accelerometer-magnetometer.html>
 
-
 ### Télécommande IR
 Pour communiquer mes commandes au robot j'utilise une télécommande IR.
 
@@ -58,7 +64,6 @@ Une mattrice 8x8 est utilisée pour connaitre l'état du robot.
 ![Matrice 8x8] (https://github.com/tmaroye/FlashGordon/blob/master/Photos/matrice8x8.jpg)
 
 <http://www.miniinthebox.com/fr/module-d-affichage-max7219-dot-matrix-module-module-de-microcontroleur-du-module-de-commande-arduino_p639090.html>
-
 
 ### Batterie LIPO
 La batterie est une LIPO 3S de 500 mAH 35C.
