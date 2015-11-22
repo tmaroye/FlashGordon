@@ -14,7 +14,7 @@ Voici la liste des éléments qui constitue à ce jour mon robot.
 ### La carte contrôleur :
 J'ai choisi une carte BLUNO parcequ'elle intégre une interphace Bluetooth 4.0 et que son bus I2C n'est pas jumelé avec les ports analogiques du contôleur. Cela me fait gagner deux entrées analogiques.
 
-![BLUNO] (https://github.com/tmaroye/FlashGordon/blob/master/Photos/bluno.png)
+![BLUNO] (https://github.com/tmaroye/FlashGordon/blob/master/Photos/bluno.jpg)
 
 ### La motorisation
 Comme je ne savais vraiment pas par ou commancer, j'ai décidé d'utiliser un chassi tout fait.
