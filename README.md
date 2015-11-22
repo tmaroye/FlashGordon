@@ -52,7 +52,7 @@ Pour communiquer mes commandes au robot j'utilise une télécommande IR.
 ### Affichage : matrice 8x8
 Une mattrice 8x8 est utilisée pour connaitre l'état du robot.
 
-![Matrice 8x8] (https://github.com/tmaroye/FlashGordon/blob/master/Photos/matrice.jpg)
+![Matrice 8x8] (https://github.com/tmaroye/FlashGordon/blob/master/Photos/matrice8x8.jpg)
 
 <http://www.miniinthebox.com/fr/module-d-affichage-max7219-dot-matrix-module-module-de-microcontroleur-du-module-de-commande-arduino_p639090.html>
 
