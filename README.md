@@ -70,4 +70,9 @@ La batterie est une LIPO 3S de 500 mAH 35C.
 
 
 
+# Lien utile :
+
+#Utiliser Sublime Text 2 comme IDE à la place de l'IDE Arduino : <http://eskimon.fr/2224-arduino-mini-tuto-utiliser-sublime-text-ide>
+
+
 
