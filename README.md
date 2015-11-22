@@ -72,7 +72,23 @@ La batterie est une LIPO 3S de 500 mAH 35C.
 
 # Lien utile :
 
-#Utiliser Sublime Text 2 comme IDE à la place de l'IDE Arduino : <http://eskimon.fr/2224-arduino-mini-tuto-utiliser-sublime-text-ide>
+Utiliser Sublime Text 2 comme IDE à la place de l'IDE Arduino : <http://eskimon.fr/2224-arduino-mini-tuto-utiliser-sublime-text-ide><br/>
+
+*ATTETION* Il y a un bug dans le parametrage du plugin.<br/>
+Pour le corriger il suffit de faire cela :<br/>
+~ cd /ARDUINO_PATH/Arduino.app/Contents/Resources<br/>
+
+my is # cd /Applications/Arduino.app/Contents/Resources<br/>
+~ ln -s ../Java ./Java<br/>
+
+Et tout fonctionne...<br/>
+
+
+Pour plus d'info voir ici : <https://github.com/Robot-Will/Stino/issues/9#issuecomment-64520217><br/>
+NB : Perso j'utilise la derniere verion qui est sur GitHub ici : <https://github.com/Robot-Will/Stino/wiki/Manual-installation>
+et telechargable ici : <https://github.com/Robot-Will/Stino/archive/new-stino.zip> Ne pas oulier de faire la copie du répertoire Java de l'IDE d'origine !!<br/>
+
+
 
 
 
