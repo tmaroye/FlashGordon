@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ![FlashGordon] (https://github.com/tmaroye/FlashGordon/blob/master/FlashGordon.png)
+=======
+![Logo FlashGordon] (https://github.com/tmaroye/FlashGordon/blob/master/FlashGordon.png)
+>>>>>>> 4efce945c2d19bd3786d5165c527f86ad5197656
 
 # FlashGordon
 Arduino Mini Suno Robot
