@@ -1,8 +1,8 @@
-/* Cobra V1
+/* FlashGordon Mini Sumo Robot
  Sumo Code 1.0 Beta
  LMR User: Thierry MAROYE
  October 2015
-*/
+ */
 
 // SETUP PINS
 
@@ -98,7 +98,7 @@
 long setPointBack;
 long setPointLeft;
 long setPointRight;
-long setPointDef = 25;
+long setPointDef = 25; // Default value in case we don't use de calibration procedur
 long readIRL;
 long readIRR;
 long readIRB;
@@ -137,17 +137,17 @@ void dmpDataReady() {
 
 void setup() {
   // join I2C bus (I2Cdev library doesn't do this automatically)
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
   Wire.begin();
   TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
-#elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+  #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
   Fastwire::setup(400, true);
-#endif
+  #endif
   // initialize serial communication
   // (115200 chosen because it is required for FiFo not OverFlow
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  // Serial.println("Flash Gordon V1.0 Start...");
+    Serial.println("Flash Gordon V1.0 Start...");
   reception_ir.enableIRIn(); // démarre la réception
   pinMode(DIRL, OUTPUT);
   pinMode(DIRR, OUTPUT);
@@ -193,13 +193,13 @@ void setup() {
     mpu.setDMPEnabled(true);
 
     // enable Arduino interrupt detection
-    //Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
+    // Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
     attachInterrupt(0, dmpDataReady, RISING);
     mpuIntStatus = mpu.getIntStatus();
     // Serial.println(F("DMP ready! Waiting for first interrupt..."));
     // get expected DMP packet size for later comparison
     packetSize = mpu.dmpGetFIFOPacketSize();
-  } else {
+    } else {
     // ERROR!
     // 1 = initial memory load failed
     // 2 = DMP configuration updates failed
@@ -207,12 +207,12 @@ void setup() {
     // Serial.print(F("DMP Initialization failed (code "));
     // Serial.print(devStatus);
     // Serial.println(F(")"));
-    WriteMatrix(Matrix_Bad);
-    delay(5000);
-    WriteMatrix(devStatus);
-    while (1); // Si um problème on ne va pas plus loin !
+WriteMatrix(Matrix_Bad);
+delay(5000);
+WriteMatrix(devStatus);
+    while (1); // If bug ws stop !
   }//END Setup
-  mStop();
+  mStop(); // we stop the motor.
   WriteMatrix(Matrix_Warm);
 }
 
@@ -233,15 +233,12 @@ void loop() {
   // ** 100Hz Fast Loop                                                 **
   // *********************************************************************
   // wait for MPU interrupt or extra packet(s) available
-  while (!mpuInterrupt && fifoCount < packetSize) {
+  while (!mpuInterrupt && fifoCount < packetSize) 
+  {
   }
 
   GetHeading(&Heading, &HeadingTgt, Moving);
-  /*  if (Moving)  	// We seem to need more gain when the robot is moving? and less when stationary.
-      Reduction = .3; // lower gain required
-    else
-      Reduction = 1;*/
-  Heading = ecretage(Heading);
+  Heading = ecretage(Heading); // do noting now :(
 
   PID(Heading, HeadingTgt, &Demand, Reduction * 15, Reduction * .08, 0, Moving);	// If not moving zero integral
 
@@ -253,7 +250,7 @@ void loop() {
     // Get user command
     DecodeUserSwitch(&Command, &Moving);
     //Get system gen commands
-    CheckIMU(&Command, Heading);                        // Look to see when the IMU has warmed up, issue a CMD when it has otherwise prevent start
+    CheckIMU(&Command, Heading); // Look to see when the IMU has warmed up, issue a CMD when it has otherwise prevent start
 
     BorderCheck(&Command);
 
@@ -261,8 +258,6 @@ void loop() {
     Serial.print(Moving);
     Serial.print("; Command : ");
     Serial.print(Command);
-
-
     Serial.print("; Heading : ");
     Serial.print(Heading);
     Serial.print("; HeadingTgt : ");
@@ -272,26 +267,18 @@ void loop() {
 
     MatrixRun(&Command);
     //Execute commads
-    ExecuteCommand(&Command, &Moving, &HeadingTgt, Demand) ; // @SM takes several seconds to move the robot with a state machine
-    // read CMD , then execute CMD in background.  For turn this is a modification of the TGT then a wait
-    // when a CMD has executed set it to NEXT_CMD so above code pulls next CMD
-    // For FWD the Auto head demands are offset FWD or back.
-    // The Last CMD is allways "END" which which turns off motors and clears moving
-    // drivemotors allways does auto HDG when Moving!!
+    ExecuteCommand(&Command, &Moving, &HeadingTgt, Demand) ;
   }//END 10HZ
+    }
+
+//                                   Procedur
+// #############################################################################
 
 
-  /*  if (Command != 0)
-    {
-      Serial.print("Command : ");
-      Serial.println(Command);
-      // CurrentCMD = Command;
-    }*/
-}
-
-// Procedur
-
-// IR Sensor Calibation Procedur
+// #############################################################################
+// ###                    IR Sensor Calibation Procedur                      ###
+// #############################################################################
+ 
 void Calibrate() {
   Serial.println("Calibation");
   setPointBack = RCTime(lineB);
@@ -305,7 +292,7 @@ void Calibrate() {
     Serial.print(setPointBlack);
     Serial.print(" Moy : ");
     Serial.println(setPointDef);*/
-}
+  }
 
 // #############################################################################
 // ###                             RCTime procedur                           ###
@@ -406,6 +393,10 @@ void WriteMatrix(int code)
   }
 } // End WriteMatrix
 
+// #############################################################################
+// ###                             GetHeading procedur                       ###
+// #############################################################################
+
 // Use the IMU to get the curreent heading.  This is 0-360 degrees.
 // It's not relative to North but where the robot was pointing when the
 // GO was demand.
@@ -460,16 +451,12 @@ void  GetHeading(float *Heading, float *HeadingTgt, byte Moving)
   }
 }//END GetHeading
 
-
-//
-// Decode the analog keyboard
+// #############################################################################
+// ###                    Decode User Ir Keyboard procedur                   ###
+// #############################################################################
 
 void DecodeUserSwitch(byte *Command, byte *Moving)
 {
-  // static byte state = 0;
-
-  //  *Command = NONE;
-
   if (reception_ir.decode(&decode_ir))
   {
     // Serial.print("decode ir : ");
@@ -581,15 +568,15 @@ void DecodeUserSwitch(byte *Command, byte *Moving)
         // Serial.println("Touche 9");
         WriteMatrix(Matrix_9);
         break;
-
-
-    }
+      }
 
     reception_ir.resume(); // reçoit le prochain code
   }
 }//END DecodeUSerSwitch
 
-
+// #############################################################################
+// ###                               CheckIMU procedur                       ###
+// #############################################################################
 //
 // Check to see if the IMU has settled down and is giving a steady heading.
 // If it hasn't disable the go button.
@@ -614,7 +601,7 @@ void CheckIMU(byte *Command, float  Heading)
         *Command = IMU_OK;
       }
       else
-        oHeading = Heading;
+      oHeading = Heading;
     }
   }
   //  Serial.print(" ChekIMU Command");
@@ -625,6 +612,7 @@ void CheckIMU(byte *Command, float  Heading)
 // #############################################################################
 // ###                           Matrix Run procedur                         ###
 // #############################################################################
+
 void MatrixRun(byte *Command)
 {
   static int Code = 9999;
@@ -632,72 +620,72 @@ void MatrixRun(byte *Command)
   switch (*Command)
   {
     case  GO: // Touche On
-      Code = Matrix_On;
-      break;
+    Code = Matrix_On;
+    break;
 
     case  IMU_WARM:
-      Code = Matrix_Warm;
-      break;
+    Code = Matrix_Warm;
+    break;
 
     case  IMU_OK:
-      Code = Matrix_Good;
-      break;
+    Code = Matrix_Good;
+    break;
 
     case  SPEEDP: // Touche Vol +
-      Code = Matrix_Plus;
-      break;
+    Code = Matrix_Plus;
+    break;
 
     case  Stop: // Touche Func/Stop
-      Code = Matrix_Stop;
-      break;
+    Code = Matrix_Stop;
+    break;
 
     case LEFT : // Touche FLeft
-      Code = Matrix_Left;
-      break;
+    Code = Matrix_Left;
+    break;
 
     case RIGHT: // Touche FRight
-      Code = Matrix_Right;
-      break;
+    Code = Matrix_Right;
+    break;
 
     case DN: // Touche FDown
-      Code = Matrix_Down;
-      break;
+    Code = Matrix_Down;
+    break;
 
     case 16617583: // Touche Vol -
-      Code = Matrix_Moin;
-      break;
+    Code = Matrix_Moin;
+    break;
 
     case UP: // Touche FUp
-      Code = Matrix_Up;
-      break;
+    Code = Matrix_Up;
+    break;
 
     case CAL: // Touche EQ
-      Code = Matrix_Cal;
-      break;
+    Code = Matrix_Cal;
+    break;
 
     case NONE:
-      Code = Matrix_Good;
-      break;
+    Code = Matrix_Good;
+    break;
 
     case BorderBack:
-      Code = Matrix_LineBack;
-      break;
+    Code = Matrix_LineBack;
+    break;
 
     case BorderLeftRight:
-      Code = Matrix_LineLeftRight;
-      break;
+    Code = Matrix_LineLeftRight;
+    break;
 
     case BorderLeft:
-      Code = Matrix_LineLeft;
-      break;
+    Code = Matrix_LineLeft;
+    break;
 
     case BorderRight:
-      Code = Matrix_LineRight;
-      break;
+    Code = Matrix_LineRight;
+    break;
 
     case DELAY:
-      Code = Matrix_Pause;
-      break;
+    Code = Matrix_Pause;
+    break;
 
   }
 
@@ -709,7 +697,6 @@ void MatrixRun(byte *Command)
     matrixOldCode = Code;
   }
 }
-
 
 // #############################################################################
 // ###                               PID procedur                            ###
@@ -742,9 +729,9 @@ void PID(float Hdg, float HdgTgt, int *Demand, float kP, float kI, float kD, byt
   //error correction for angular overlap
   error = Hdg - HdgTgt;
   if (error < 180)
-    error += 360;
+  error += 360;
   if (error > 180)
-    error -= 360;
+  error -= 360;
 
   //http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
 
@@ -775,18 +762,25 @@ void PID(float Hdg, float HdgTgt, int *Demand, float kP, float kI, float kD, byt
   // Serial.println(*Demand);
 }//END getPID
 
+// #############################################################################
+// ###                            LimitInt procedur                          ###
+// #############################################################################
+
 //  LimitInt
 //  Clamp an int between a min and max.
 
 void LimitInt(int *x, int Min, int Max)
 {
   if (*x > Max)
-    *x = Max;
+  *x = Max;
   if (*x < Min)
-    *x = Min;
+  *x = Min;
 
 }//END LimitInt
 
+// #############################################################################
+// ###                             LimitFloat procedur                       ###
+// #############################################################################
 //
 // Clamp a float between a min and max.  Note doubles are the same
 // as floats on this platform.
@@ -794,17 +788,16 @@ void LimitInt(int *x, int Min, int Max)
 void LimitFloat(float *x, float Min, float Max)
 {
   if (*x > Max)
-    *x = Max;
+  *x = Max;
   if (*x < Min)
-    *x = Min;
+  *x = Min;
 
 }//END LimitInt
 
 // #############################################################################
 // ###                    Execute Command procedur                           ###
 // #############################################################################
-
-
+//
 // This routine executes the command in *CurrentCMD then zeroes it when done.
 // This only occurs if we are moving otherwise we are in standby.
 
@@ -820,88 +813,86 @@ void ExecuteCommand(byte *Command, byte *Moving, float *HeadingTgt, float Demand
     //Serial.print("; State : ");
     //Serial.println(state);
 
-    // @@@@@@@@@@ CMD Init @@@@@@@@@@@@@@@@@@@@@@
     if (state == 0)
     {
 
       switch (*Command)
       {
         case UP:
-          ForeDmd = 200;
-          break;
+        ForeDmd = 200;
+        break;
 
         case DN:
-          ForeDmd = -ForeDmd;
-          *Command = NONE;
-          break;
+        ForeDmd = -ForeDmd;
+        *Command = NONE;
+        break;
 
         case LEFT:
-          *HeadingTgt -= 90;
-          if (*HeadingTgt < 0) *HeadingTgt += 360;
-          *Command = NONE;
-          break;
+        *HeadingTgt -= 90;
+        if (*HeadingTgt < 0) *HeadingTgt += 360;
+        *Command = NONE;
+        break;
 
         case RIGHT:
-          *HeadingTgt += 90;
-          if (*HeadingTgt > 360) *HeadingTgt -= 360;
-          *Command = NONE;
-          break;
+        *HeadingTgt += 90;
+        if (*HeadingTgt > 360) *HeadingTgt -= 360;
+        *Command = NONE;
+        break;
 
         case GO:
-          Time = millis();
-          state++;
-          break;
+        Time = millis();
+        state++;
+        break;
 
         case Stop:
-          state = 0;
-          ForeDmd = 0;
-          Demand = 0;
-          *Moving = 0;
-          *Command = NONE;
-          break;
+        state = 0;
+        ForeDmd = 0;
+        Demand = 0;
+        *Moving = 0;
+        *Command = NONE;
+        break;
 
         case CAL:
-          ForeDmd = 0;
-          *Moving = 0;
-          state++;
-          break;
+        ForeDmd = 0;
+        *Moving = 0;
+        state++;
+        break;
 
         case BorderBack:
-          ForeDmd = abs(ForeDmd);
-          state++;
-          Time = millis();
-          *Command = NONE;
-          break;
+        ForeDmd = abs(ForeDmd);
+        state++;
+        Time = millis();
+        *Command = NONE;
+        break;
 
         case BorderLeftRight:
-          ForeDmd = -(abs(ForeDmd));
-          state++;
-          Time = millis();
-          *Command = NONE;
-          break;
+        ForeDmd = -(abs(ForeDmd));
+        state++;
+        Time = millis();
+        *Command = NONE;
+        break;
 
         case BorderLeft:
-          *HeadingTgt += 175;
-          if (*HeadingTgt > 360) *HeadingTgt -= 360;
-          state++;
-          Time = millis();
-          *Command = NONE;
-          break;
+        *HeadingTgt += 175;
+        if (*HeadingTgt > 360) *HeadingTgt -= 360;
+        state++;
+        Time = millis();
+        *Command = NONE;
+        break;
 
         case BorderRight:
-          *HeadingTgt -= 175;
-          if (*HeadingTgt < 0) *HeadingTgt += 360;
-          *Command = NONE;
-          state++;
-          Time = millis();
-          break;
+        *HeadingTgt -= 175;
+        if (*HeadingTgt < 0) *HeadingTgt += 360;
+        *Command = NONE;
+        state++;
+        Time = millis();
+        break;
 
         case NONE:
-          break;
+        break;
       }//END switch
 
     }//END IF State == 0
-    // @@@@@@@@@@ CMD Execute @@@@@@@@@@@@@@@@@@@@
     else // State != 0
     {
       // Serial.print( " Else State 1 Command : ");
@@ -959,8 +950,8 @@ void ExecuteCommand(byte *Command, byte *Moving, float *HeadingTgt, float Demand
       }
       else // neutralise les commandes le temps de se égader de la bande blanche
         // attention il faudra modifier en cas d'attaque.
-      {
-        TimeDelta = millis() - Time;
+        {
+          TimeDelta = millis() - Time;
         if (TimeDelta >= 700)  // delay de neutralisation a mettre en varialble apres
         {
           Time = 0;
@@ -972,12 +963,7 @@ void ExecuteCommand(byte *Command, byte *Moving, float *HeadingTgt, float Demand
           *Command = DELAY;
         }
       }
-
-
-
     } // State == 0
-    // @@@@@@@@@@ ----------- @@@@@@@@@@@@@@@@@@@@
-
   }
   else  // Moving
   {
@@ -1000,14 +986,14 @@ void ExecuteCommand(byte *Command, byte *Moving, float *HeadingTgt, float Demand
     Serial.print( "Time : ");
     Serial.println(Time);*/
 
-  DriveMotors( (Demand * -1) + ForeDmd, ( Demand * 1) + ForeDmd, *Moving);
+    DriveMotors( (Demand * -1) + ForeDmd, ( Demand * 1) + ForeDmd, *Moving);
 
 }//END ExecuteCommand
 
 // #############################################################################
 // ###                           Drive Motor procedur                        ###
 // #############################################################################
-
+//
 // Drive port / stbd motors fwd or backwards using PWM.
 // A breakout calc is needed to linearise the response since
 // torque is proportional to voltage on a DC mottor the wheels
@@ -1016,22 +1002,10 @@ void ExecuteCommand(byte *Command, byte *Moving, float *HeadingTgt, float Demand
 // A L9110 IC controls the motors and 2 PWMs are used.  2 DOs control
 // direction.
 //
-// IA(DO) IB(PWM) Motor State
-// L      L       Off
-// H      L       Forward
-// L      H       Reverse
-// H      H       Off
-//
 // Inputs
 // -----
 // DriveVal    +/-1000
 //
-// Note
-// ----
-// Demand>     0  100 200 300 400 500 600 700 800 900 1000
-// Distance>  33  70  93  110 128 140 151 164* 168 168 168
-//
-// Motor demands are linear ish up to 700 with AAA hybrio batteries.
 // For PID Distance = 400 and PID gets 300
 //
 void DriveMotors(int PDrive, int SDrive, byte Moving)
@@ -1072,7 +1046,7 @@ void DriveMotors(int PDrive, int SDrive, byte Moving)
   {
     //
     digitalWrite(DIRR, HIGH);
-    analogWrite(PWRR, Mag); //you haave to do this; look at the truth table
+    analogWrite(PWRR, Mag); 
   }
   else
   {
@@ -1090,6 +1064,10 @@ void DriveMotors(int PDrive, int SDrive, byte Moving)
       Serial.println(Moving);*/
 
 }//END DriveMotors
+
+// #############################################################################
+// ###                            BorderCheck procedur                       ###
+// #############################################################################
 
 void BorderCheck(byte *Command)
 {
@@ -1123,7 +1101,12 @@ void BorderCheck(byte *Command)
   }
 }
 
+// #############################################################################
+// ###                               Ecretage procedur                       ###
+// #############################################################################
+//
 // Filtre ecretage
+// Ne marche pas du tout !!!
 float ecretage(float val)
 {
   /*  static bool init = true;
@@ -1133,7 +1116,7 @@ float ecretage(float val)
       Serial.print(val);
       Serial.print(" oldVal : ");
       Serial.print(oldVal);
-    */
+      */
   /* if (init)
    {
      if (val != 0 )
@@ -1157,6 +1140,6 @@ float ecretage(float val)
 
    //  Serial.print(" val 2: ");
    // Serial.println(val);
-  */
-  return val;
-}
+   */
+   return val;
+ }
